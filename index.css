@@ -1,0 +1,13 @@
+:root {
+    --instant-web-charts-theme-color: #9b59b6;
+    --instant-web-charts-theme-color-light: #be90d4;
+    --instant-web-charts-text-color: white;
+}
+
+.instant-web-charts-row-highlight {
+    border: 1px solid var(--instant-web-charts-theme-color);
+}
+
+.instant-web-charts-column-highlight {
+    background-color: var(--instant-web-charts-theme-color-light);
+}

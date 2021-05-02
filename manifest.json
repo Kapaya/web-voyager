@@ -1,0 +1,32 @@
+  {
+    "name": "Instant Web Charts",
+    "version": "1.0.0",
+    "description": "Prototype of web scraping for visualization",
+    "manifest_version": 2,
+    "content_scripts": [
+      {
+        "js": [
+          "./modules/constants.js",
+          "./modules/dom-helpers.js",
+          "./modules/wrapper-induction.js",
+          "./modules/visual-feedback.js",
+          "./modules/scraper.js",
+          "./index.js"
+        ],
+        "css": [
+          "./index.css"
+        ],
+        "matches": [
+          "<all_urls>"
+        ]
+      }
+    ],
+    "background": {
+      "scripts": [
+        "./background.js"
+      ]
+    },
+    "permissions": [
+      "contextMenus"
+    ]
+  }
