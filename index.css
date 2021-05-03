@@ -2,7 +2,63 @@
     --instant-web-charts-theme-color: #9b59b6;
     --instant-web-charts-theme-color-light: #be90d4;
     --instant-web-charts-text-color: white;
+    --instant-web-charts-margin: 2.5px;
+    --instant-web-charts-padding: 2.5px;
 }
+
+#instant-web-charts-root {
+    display: flex;
+    position: fixed;
+    padding: var( --instant-web-charts-padding);
+    bottom: 0;
+    left: 0;
+    height: 280px;
+    width: 100vw;
+    z-index: 10000000;
+    overflow: hidden;
+    background-color: var(--instant-web-charts-theme-color-light);
+    color: var(--instant-web-charts-text-color);
+    border-radius: 5px;
+}
+
+#instant-web-charts-root .view {
+    margin: var(--instant-web-charts-margin);
+    padding: var( --instant-web-charts-padding); 
+    display: flex;
+    flex-direction: column;
+    flex: 1;
+    justify-content: center;
+    align-items: center;
+}
+
+#instant-web-charts-root .view > * {
+    margin: var(--instant-web-charts-margin);
+    padding: var( --instant-web-charts-padding); 
+}
+
+#instant-web-charts-root textarea {
+    flex: 1;
+    width: 100%;
+    resize: none;
+    font-size: 0.8em;
+    color: black;
+}
+
+#instant-web-charts-root .view .chart {
+    flex: 1;
+    width: 100%;
+    background-color: white;
+}
+
+#instant-web-charts-root .view .title {
+    display: flex;
+    width: 100%;
+}
+
+#instant-web-charts-root .view .title span {
+    flex: 1;
+}
+
 
 .instant-web-charts-row-highlight {
     border: 1px solid var(--instant-web-charts-theme-color);
