@@ -13,4 +13,6 @@ To test out Instant Web Charts you can follow these steps:
 2. Open Chrome and load its browser extensions page by pasting chrome://extensions/ into the search bar
 3. Make sure "Developer mode", in the top right, is toggled on
 4. Click "Load unpacked" and select the root of the repository folder you cloned
-5. Navigate to https://www.timeanddate.com/holidays/us/ and follow the steps shown in the milestone video (https://www.loom.com/share/98206c5a65cb43709033aed019dce06c). As this is a prototype, not everything might go as expected so make sure to follow the exact sequence of steps shown in the video.
+5. Navigate to https://www.timeanddate.com/holidays/us/ and follow the steps shown in the milestone video: https://www.loom.com/share/98206c5a65cb43709033aed019dce06c
+
+As this is a prototype, not everything might go as expected so make sure to follow the exact sequence of steps shown in the video.
