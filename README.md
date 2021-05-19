@@ -1,6 +1,7 @@
 # Web Voyager: Lightweight Visualization Of Website Data
 
 ![Alt text](./final/overview.png?raw=true "Overview of Web Voyager")
+*An overview of visualizing holiday data on timeanddate.com using Web Voyager. 1) Holiday type values scraped and highlighted (light blue) by clicking on a single holiday type value 2) Scraped holiday data displayed as a JSON array with auto generated property names 3)Vega-lite specification used to create the visualization 4) Visualization created from Vega-lite specification*
 
 ## Abstract
 
@@ -11,8 +12,10 @@ In this work, I present an interaction model for lightweight visualization of st
 To illustrate this approach, I have implemented a Chrome browser extension called Web Voyager. Through case studies, I show that Web Voyager can be used to visualize data on real-world websites. Finally, I discuss the limitations of Web Voyager and opportunities for future work.
 
 Team Members: Kapaya Katongo
+
 Paper: https://github.com/6859-sp21/final-project-web-scraping-for-visualization/tree/main/final/paper.pdf
-Demo: https://github.com/6859-sp21/final-project-web-scraping-for-visualization/tree/main/final/demo.mp4
+
+Demo: https://youtu.be/wnvdrx_pIyM
 
 ## Setup
 
