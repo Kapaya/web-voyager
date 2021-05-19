@@ -1,34 +1,39 @@
 const Scraper = (function() {
    
-    function scrape({ rowSelector }) {
+    function scrape({ rowSelector, columnSelectors }) {
         const data = [];
-        if (rowSelector) {
+        if (rowSelector && columnSelectors) {
             Array.from(document.querySelectorAll(rowSelector))
                 .map(rowElement => {
-                    const leaves = DOMHelpers.getLeafNodes([rowElement]);
                     const row = {};
-                    leaves.forEach((leaf, i) => {
+                    columnSelectors.forEach((columnSelector, i) => {
                         const column = _indexToAlpha(i);
-                        row[column] = leaf.textContent;
+                        const columnElement = rowElement.querySelector(columnSelector);
+                        if (columnElement) {
+                            row[column] = columnElement.textContent;
+                        } else {
+                            row[column] = "";
+                        }  
                     });
                     data.push(row);
                 })
             
         }
         if (data.length) {
-            VisualFeedback.highlightRowElements({ rowSelector });
+            VisualFeedback.highlightRowElements({ rowSelector, columnSelectors });
+            Panel.clearChart();
             Panel.setChartData(data);
             Panel.setChartConfig();
         }
     }
 
     function start() {
-        Utils.eventListener({
-            element: document.body,
-            type: "add",
-            event: "mousemove",
-            listener: _mouseMoveListener
-        });
+        // Utils.eventListener({
+        //     element: document.body,
+        //     type: "add",
+        //     event: "mousemove",
+        //     listener: _mouseMoveListener
+        // });
         Utils.eventListener({
             element: document.body,
             type: "add",
@@ -53,9 +58,7 @@ const Scraper = (function() {
         Panel.clearChartData();
         const { target } = event;
         const wrapperData = WrapperInduction.getWrapperData(target);
-        if (wrapperData) {
-            scrape(wrapperData);
-        }
+        scrape(wrapperData);
     }
 
     function _mouseClickListener(event) {
@@ -66,7 +69,9 @@ const Scraper = (function() {
             event.stopPropagation();
             return;
         }
-        const wrapperData = WrapperInduction.getWrapperData();
+        event.preventDefault();
+        event.stopPropagation();
+        const wrapperData = WrapperInduction.getWrapperData(event.target);
         scrape(wrapperData);
         Utils.eventListener({
             element: document.body,
@@ -77,7 +82,7 @@ const Scraper = (function() {
     }
 
     function _ignoreEvent(event){
-        if (_panelElement.contains(event.target)) {
+        if (!event.target || !document.body.contains(event.target) || _panelElement.contains(event.target)) {
             return true;
         }
         return false;

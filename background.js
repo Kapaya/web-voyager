@@ -7,8 +7,8 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
 });
 
 chrome.contextMenus.create({
-    id: 'instant-web-charts',
-    title: 'Instant Web Charts',
+    id: 'web-voyager',
+    title: 'Web Voyager',
     contexts: ['page'],
     type: 'normal',
     onclick: () => {

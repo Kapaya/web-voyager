@@ -1,29 +1,28 @@
 :root {
-    --instant-web-charts-theme-color: #9b59b6;
-    --instant-web-charts-theme-color-light: #be90d4;
-    --instant-web-charts-text-color: white;
-    --instant-web-charts-margin: 2.5px;
-    --instant-web-charts-padding: 2.5px;
+    --web-voyager-theme-color: #38425d;
+    --web-voyager-theme-color-light: #e2e9f3;
+    --web-voyager-text-color: white;
+    --web-voyager-margin: 2.5px;
+    --web-voyager-padding: 2.5px;
 }
 
-#instant-web-charts-root {
+#web-voyager-root {
     display: flex;
     position: fixed;
-    padding: var( --instant-web-charts-padding);
+    padding: var( --web-voyager-padding);
     bottom: 0;
     left: 0;
     height: 280px;
     width: 100vw;
     z-index: 10000000;
     overflow: hidden;
-    background-color: var(--instant-web-charts-theme-color-light);
-    color: var(--instant-web-charts-text-color);
-    border-radius: 5px;
+    background-color: var(--web-voyager-theme-color);
+    color: var(--web-voyager-text-color);
 }
 
-#instant-web-charts-root .view {
-    margin: var(--instant-web-charts-margin);
-    padding: var( --instant-web-charts-padding); 
+#web-voyager-root .view {
+    margin: var(--web-voyager-margin);
+    padding: var( --web-voyager-padding); 
     display: flex;
     flex-direction: column;
     flex: 1;
@@ -31,12 +30,12 @@
     align-items: center;
 }
 
-#instant-web-charts-root .view > * {
-    margin: var(--instant-web-charts-margin);
-    padding: var( --instant-web-charts-padding); 
+#web-voyager-root .view > * {
+    margin: var(--web-voyager-margin);
+    padding: var( --web-voyager-padding); 
 }
 
-#instant-web-charts-root textarea {
+#web-voyager-root textarea {
     flex: 1;
     width: 100%;
     resize: none;
@@ -44,26 +43,27 @@
     color: black;
 }
 
-#instant-web-charts-root .view .chart {
+#web-voyager-root .view .chart {
     flex: 1;
     width: 100%;
     background-color: white;
+    overflow: scroll;
 }
 
-#instant-web-charts-root .view .title {
+#web-voyager-root .view .title {
     display: flex;
     width: 100%;
 }
 
-#instant-web-charts-root .view .title span {
+#web-voyager-root .view .title span {
     flex: 1;
 }
 
 
-.instant-web-charts-row-highlight {
-    border: 1px solid var(--instant-web-charts-theme-color);
+.web-voyager-row-highlight {
+    border: 1px solid var(--web-voyager-theme-color);
 }
 
-.instant-web-charts-column-highlight {
-    background-color: var(--instant-web-charts-theme-color-light);
+.web-voyager-column-highlight {
+    background-color: var(--web-voyager-theme-color-light);
 }

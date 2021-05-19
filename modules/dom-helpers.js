@@ -26,17 +26,6 @@ const DOMHelpers = (() => {
         }
         return false;
     }
-    function getLeafNodes(nodes, result = []){
-        for(var i = 0, length = nodes.length; i < length; i++){
-          if(!nodes[i].children || nodes[i].children.length === 0){
-            result.push(nodes[i]);
-          }else{
-            result = getLeafNodes(nodes[i].children, result);
-          }
-        }
-        return result;
-    }
-
     function generateIndexSelectorFrom(node, from) {
         if (node.isSameNode(from)) {
             return null;
@@ -128,12 +117,23 @@ const DOMHelpers = (() => {
         return [];
     }
 
+    function getParentRowElement({ rowSelector, node }) {
+        if (rowSelector) {
+            const rowElements = Array.from(document.body.querySelectorAll(rowSelector));
+            for (let i = 0; i < rowElements.length; i++) {       
+                if (rowElements[i].contains(node)) {
+                    return rowElements[i];
+                }
+            }
+        }
+        return;
+    }
+
     return {
-        getLeafNodes,
-        inRowSet,
         generateClassSelector,
         generateClassSelectorFrom,
         generateIndexSelector,
-        generateIndexSelectorFrom
+        generateIndexSelectorFrom,
+        getParentRowElement
     }
 })()

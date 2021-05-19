@@ -1,0 +1,14 @@
+{
+    "$schema": "https://vega.github.io/schema/vega-lite/v5.json",
+    "data": {
+        "name": "scrapedData"
+    },
+    "transform": [
+        { "filter": "datum.A === 'Federal Holiday'" } 
+    ],
+    "mark": "bar",
+    "encoding": {
+        "x": { "field": "B", "aggregate": "count", "title": "Number of federal holidays" },
+        "y": { "field": "B",  "type": "nominal", "title": "Day" }
+    }
+}

@@ -18,10 +18,10 @@ const Panel = (function(){
         _chartConfigTextArea = _panelElement.querySelector('#chart-config textarea');
         _chartViewContainer = _panelElement.querySelector("#chart-view .chart");
         Utils.eventListener({
-            element: _panelElement.querySelector("#chart-config #run"),
+            element: _panelElement.querySelector("#chart-config textarea"),
             type: "add",
-            event: "click",
-            listener: _runButtonListener
+            event: "input",
+            listener: _executeChartConfig
         });
         body.append(_panelElement);
     }
@@ -44,23 +44,29 @@ const Panel = (function(){
         _chartConfigTextArea.value = "";
     }
 
+    function clearChart() {
+        const chartElement = _panelElement.querySelector("#chart-view .chart");
+        chartElement.innerHTML = "";
+    }
+
     function _createPanelElement() {
         const panelElementString = `
             <div id='chart-data' class='view'>
-                <span class='title'> Scraped Data </span>
+                <div class='title'>
+                    <span> Scraped Data </span>
+                </div>
                 <textarea></textarea>
             </div>
             <div id='chart-config' class='view'>
                 <div class='title'>
                     <span> Vega-Lite Config </span>
-                    <div class='controls'>
-                        <button id='run'> Run </button>
-                    </div> 
                 </div>
                 <textarea></textarea>
             </div>
             <div id='chart-view' class='view'>
-                <span class='title'> Vega-Lite Chart </span>
+                <div class='title'>
+                    <span> Vega-Lite Chart </span>
+                </div>
                 <div class='chart'></div>
             </div>
         `;
@@ -70,7 +76,7 @@ const Panel = (function(){
         return panelElement;
     }
 
-    async function _runButtonListener() {
+    async function _executeChartConfig() {
         try {
             const chartConfig = JSON.parse(_chartConfigTextArea.value);
             const chartData = JSON.parse(_chartDataTextArea.value);
@@ -81,7 +87,7 @@ const Panel = (function(){
                 .insert("scrapedData", chartData)
                 .run();
         } catch(error) {
-            console.log(error);
+            //console.log(error);
         }
     }
 
@@ -90,6 +96,7 @@ const Panel = (function(){
         setChartData,
         setChartConfig,
         clearChartConfig,
-        clearChartData
+        clearChartData,
+        clearChart
     }
 })()

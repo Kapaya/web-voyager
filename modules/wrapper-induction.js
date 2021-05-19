@@ -1,18 +1,34 @@
 const WrapperInduction = (() => {
     let _rowElement;
     let _rowSelector;
+    let _columnSelectors = new Set([]);
    
-    function getWrapperData(target) {
-        if (target) {
-            const wrapperData = _createWrapperData(target);
-            if (wrapperData) {
-                _rowElement = wrapperData.rowElement;
-                _rowSelector = wrapperData.rowSelector;
+    function getWrapperData(node) {
+        if (node) {
+            if (!_rowElement && !_rowSelector && _columnSelectors.size === 0) {
+                const wrapperData = _createWrapperData(node);
+                if (wrapperData) {
+                    _rowElement = wrapperData.rowElement;
+                    _rowSelector = wrapperData.rowSelector;
+                    const classSelector = DOMHelpers.generateClassSelectorFrom(node, _rowElement, false);
+                    const indexSelector = DOMHelpers.generateIndexSelectorFrom(node, _rowElement);
+                    const selector = classSelector || indexSelector;
+                    _columnSelectors.add(selector);
+                }
+            } else if (_rowSelector) {
+                const rowElement = DOMHelpers.getParentRowElement({ rowSelector: _rowSelector, node });
+                if (rowElement) {
+                    const classSelector = DOMHelpers.generateClassSelectorFrom(node, rowElement, false);
+                    const indexSelector = DOMHelpers.generateIndexSelectorFrom(node, rowElement);
+                    const selector = classSelector || indexSelector;
+                    _columnSelectors.add(selector);
+                }
             }
-        }
+        } 
         return {
             rowElement: _rowElement,
-            rowSelector: _rowSelector
+            rowSelector: _rowSelector,
+            columnSelectors: Array.from(_columnSelectors)
         }
     }
 

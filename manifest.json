@@ -1,7 +1,7 @@
   {
-    "name": "Instant Web Charts",
+    "name": "Web Voyager",
     "version": "1.0.0",
-    "description": "Prototype of web scraping for visualization",
+    "description": "Prototype of lightweight exploration of website data",
     "manifest_version": 2,
     "content_scripts": [
       {
