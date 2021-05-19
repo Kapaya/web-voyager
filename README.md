@@ -1,7 +1,7 @@
 # Web Voyager: Lightweight Visualization Of Website Data
 
 ![Alt text](./final/overview.png?raw=true "Overview of Web Voyager")
-*An overview of visualizing holiday data on timeanddate.com using Web Voyager. 1) Holiday type values scraped and highlighted (light blue) by clicking on a single holiday type value 2) Scraped holiday data displayed as a JSON array with auto generated property names 3)Vega-lite specification used to create the visualization 4) Visualization created from Vega-lite specification*
+*An overview of visualizing holiday data on timeanddate.com using Web Voyager. 1) Holiday type values scraped and highlighted (light blue) by clicking on a single holiday type value 2) Scraped holiday data displayed as a JSON array with auto generated property names 3) Vega-lite specification used to create the visualization 4) Visualization created from Vega-lite specification*
 
 ## Abstract
 
@@ -24,5 +24,5 @@ To test out Web Voyager you can follow these steps:
 2. Open Chrome and load its browser extensions page by pasting "chrome://extensions/" into the search bar
 3. Make sure "Developer mode", in the top right, is toggled on
 4. Click "Load unpacked" and select the root of the repository folder you cloned
-5. Navigate to https://www.timeanddate.com/holidays/us/ and follow the steps shown in the demo video. Website data is scraped by clicking on a value while pressing the Alt key (Option on Mac). 
+5. Navigate to https://www.timeanddate.com/holidays/us/ and follow the steps shown in the demo video. Website data is scraped by clicking on a value while pressing the Alt key (Option on Mac)
 6. While Web Voyager is active on a website, you will not be able to click on links or buttons. To close it, simply refresh the page. For convenience, the Vega-lite configuration shown in the demo video can be found in the vega-lite-configs folder
