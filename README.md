@@ -13,7 +13,7 @@ To illustrate this approach, I have implemented a Chrome browser extension calle
 
 Team Members: Kapaya Katongo
 
-Paper: https://github.com/6859-sp21/final-project-web-scraping-for-visualization/tree/main/final/FinalPaper.pdf
+Paper: https://github.com/Kapaya/web-voyager/blob/main/final/FinalPaper.pdf
 
 Demo: https://youtu.be/wnvdrx_pIyM
 
