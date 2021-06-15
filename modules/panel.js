@@ -26,7 +26,7 @@ const Panel = (function(){
         body.append(_panelElement);
     }
 
-    function setChartData(data) {
+    function setChartData({ data }) {
         _chartDataTextArea.value = JSON.stringify(data, null, 2);
     }
 
@@ -34,10 +34,11 @@ const Panel = (function(){
         _chartDataTextArea.value = "";
     }
 
-    function setChartConfig() {
-        // _chartConfig.height = _chartViewContainer.offsetHeight;
-        // _chartConfig.width = _chartViewContainer.offsetWidth;
-        _chartConfigTextArea.value = JSON.stringify(_chartConfig, null, 2);
+    function setChartConfig({ data }) {
+        const fields = Object.keys(data[0]);
+        const chartConfig = ChartRecommender.recommend({ fields, data });
+        _chartConfigTextArea.value = JSON.stringify(chartConfig, null, 2);
+        _executeChartConfig();
     }
 
     function clearChartConfig() {

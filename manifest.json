@@ -9,6 +9,7 @@
           "./modules/libs/vega.js",
           "./modules/libs/vega-lite.js",
           "./modules/libs/vega-embed.js",
+          "./modules/libs/compassql/compassql.js",
           "./modules/constants.js",
           "./modules/utils.js",
           "./modules/dom-helpers.js",
@@ -16,6 +17,7 @@
           "./modules/visual-feedback.js",
           "./modules/scraper.js",
           "./modules/panel.js",
+          "./modules/chart-recommender.js",
           "./index.js"
         ],
         "css": [

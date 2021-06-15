@@ -22,8 +22,8 @@ const Scraper = (function() {
         if (data.length) {
             VisualFeedback.highlightRowElements({ rowSelector, columnSelectors });
             Panel.clearChart();
-            Panel.setChartData(data);
-            Panel.setChartConfig();
+            Panel.setChartData({ data });
+            Panel.setChartConfig({ data });
         }
     }
 
