@@ -1,74 +1,54 @@
 const Panel = (function(){
     let _panelElement;
-    let _chartDataTextArea;
-    let _chartConfigTextArea;
-    let _chartViewContainer;
-    let _chartConfig = {
-        $schema: "https://vega.github.io/schema/vega-lite/v5.json",
-        data: {
-            name: "scrapedData"
-        }
-    };
-    let _vegaEmbed;
+    let _chartViewElement;
+    let _dataFieldsElement;
+    let _data;
 
     function render() {
         const body = document.querySelector('body');
         _panelElement = _createPanelElement();
-        _chartDataTextArea = _panelElement.querySelector('#chart-data textarea');
-        _chartConfigTextArea = _panelElement.querySelector('#chart-config textarea');
-        _chartViewContainer = _panelElement.querySelector("#chart-view .chart");
+        _chartViewElement = _panelElement.querySelector('.chart-view');
+        _dataFieldsElement = _panelElement.querySelector('.chart-data .data-fields');
         Utils.eventListener({
-            element: _panelElement.querySelector("#chart-config textarea"),
-            type: "add",
-            event: "input",
-            listener: _executeChartConfig
-        });
+           element: _dataFieldsElement,
+           type: 'add',
+           event: 'change',
+           listener: _dataFieldsCheckboxEventListener 
+        })
         body.append(_panelElement);
     }
 
     function setChartData({ data }) {
-        _chartDataTextArea.value = JSON.stringify(data, null, 2);
-    }
-
-    function clearChartData() {
-        _chartDataTextArea.value = "";
-    }
-
-    function setChartConfig({ data }) {
-        const fields = Object.keys(data[0]);
-        const chartConfig = ChartRecommender.recommend({ fields, data });
-        _chartConfigTextArea.value = JSON.stringify(chartConfig, null, 2);
-        _executeChartConfig();
-    }
-
-    function clearChartConfig() {
-        _chartConfigTextArea.value = "";
-    }
-
-    function clearChart() {
-        const chartElement = _panelElement.querySelector("#chart-view .chart");
-        chartElement.innerHTML = "";
+        _data = data;
+        const sample = data[0];
+        Object
+            .keys(sample)
+            .forEach((field) => {
+                if (!_dataFieldsElementHasField({ field })) {
+                    const fieldElement = _createDataFieldElement({ field, sample });
+                    _dataFieldsElement.append(fieldElement);
+                }
+            });
+        if (_dataFieldsElement.querySelectorAll('.data-field').length > 0) {
+            _rendersCharts();
+        }
     }
 
     function _createPanelElement() {
         const panelElementString = `
-            <div id='chart-data' class='view'>
+            <div class='view chart-data'>
                 <div class='title'>
-                    <span> Scraped Data </span>
+                    <span> Data </span>
                 </div>
-                <textarea></textarea>
+                <div class='data-fields'>
+                </div>
             </div>
-            <div id='chart-config' class='view'>
+            <div class='view chart-view'>
                 <div class='title'>
-                    <span> Vega-Lite Config </span>
+                    <span> Charts </span>
                 </div>
-                <textarea></textarea>
-            </div>
-            <div id='chart-view' class='view'>
-                <div class='title'>
-                    <span> Vega-Lite Chart </span>
+                <div class='charts'>
                 </div>
-                <div class='chart'></div>
             </div>
         `;
         const panelElement = document.createElement('div');
@@ -77,27 +57,67 @@ const Panel = (function(){
         return panelElement;
     }
 
-    async function _executeChartConfig() {
-        try {
-            const chartConfig = JSON.parse(_chartConfigTextArea.value);
-            const chartData = JSON.parse(_chartDataTextArea.value);
-            const chartElement = _panelElement.querySelector("#chart-view .chart");
-            chartElement.innerHTML = "";
-            _vegaEmbed = await vegaEmbed(chartElement, chartConfig);
-            _vegaEmbed.view
-                .insert("scrapedData", chartData)
-                .run();
-        } catch(error) {
-            //console.log(error);
+    function _createDataFieldElement({ field, sample }) {
+        const checkboxIsChecked = Object.keys(sample).length === 1;
+        const fieldElementString = `
+            <div class="checkbox">
+                <input type="checkbox" aria-label="Checkbox for data field" ${checkboxIsChecked ? 'checked' : ''}>
+            </div>
+            <div class="data-field-name">
+                <input type="text" aria-label="Data field" value="${field}">
+            </div>
+        `;
+        const fieldElement = document.createElement('div');
+        fieldElement.classList.add('data-field');
+        fieldElement.dataset.field = field;
+        fieldElement.innerHTML = fieldElementString;
+        return fieldElement;
+    }
+
+    function _dataFieldsElementHasField({ field }) {
+        return !!_dataFieldsElement.querySelector(`[data-field="${field}"]`);
+    }
+
+    function _dataFieldsCheckboxEventListener(event) {
+        const { target } = event;
+        if (target.type === "checkbox") {
+            _rendersCharts();
         }
+    }
+
+
+    function _rendersCharts() {
+        const checkBoxes = _dataFieldsElement.querySelectorAll('.checkbox input') || [];
+        const fields = Array.from(checkBoxes)
+            .filter(element => element.checked)
+            .map(element => {
+                let parent = element.parentElement;
+                while (parent && !parent.dataset.field) {
+                    parent = parent.parentElement;
+                }
+                return parent.dataset.field;
+            });
+        const chartsElement = _chartViewElement.querySelector('.charts');
+        chartsElement.innerHTML = "";
+        if (fields.length) {
+            const configs = ChartRecommender.recommend({ fields, data: _data });
+            configs.forEach(async (config) => {
+                const chartElement = document.createElement('div');
+                chartElement.classList.add('chart');
+                chartsElement.append(chartElement);
+                await _renderChart({ element: chartElement, config, data: _data });
+            });
+        }  
+    }
+
+    async function _renderChart({ element, config, data  }) {
+        // config.height = element.clientHeight;
+        // config.width = element.clientWidth;
+        await vegaEmbed(element, config);
     }
 
     return {
         render,
-        setChartData,
-        setChartConfig,
-        clearChartConfig,
-        clearChartData,
-        clearChart
+        setChartData
     }
 })()

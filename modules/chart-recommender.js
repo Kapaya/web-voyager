@@ -46,17 +46,24 @@ const ChartRecommender = (function(){
         const { result } = output;
         const vlTree = cql.result.mapLeaves(result, item => item.toSpec());
         console.log(vlTree);
-        const topSpec = getToSpec({ items: vlTree.items });
-        topSpec.data = {
-            "name": "scrapedData"
-        };
-        return topSpec;   
+        const specs = []
+        populateSpecs({ items: vlTree.items, specs });
+        specs.forEach(spec => {
+            spec.data = {
+                values: spec.data
+            };
+        });
+        return specs;   
     }
-    function getToSpec({ items }) {
-        if (!items[0].items) {
-            return items[0];
-        }
-        return getToSpec({ items: items[0].items });
+    function populateSpecs({ items, specs }) {
+        items.forEach((entry, index) => {
+            if (entry.items) {
+                populateSpecs({ items: entry.items, specs });
+            } else if (index === 0) {
+                specs.push(entry);
+            }
+        });
+        return;
     }
     return {
         recommend

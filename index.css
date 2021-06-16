@@ -12,7 +12,7 @@
     padding: var( --web-voyager-padding);
     bottom: 0;
     left: 0;
-    height: 280px;
+    height: 300px;
     width: 100vw;
     z-index: 10000000;
     overflow: hidden;
@@ -25,7 +25,6 @@
     padding: var( --web-voyager-padding); 
     display: flex;
     flex-direction: column;
-    flex: 1;
     justify-content: center;
     align-items: center;
 }
@@ -35,21 +34,6 @@
     padding: var( --web-voyager-padding); 
 }
 
-#web-voyager-root textarea {
-    flex: 1;
-    width: 100%;
-    resize: none;
-    font-size: 0.8em;
-    color: black;
-}
-
-#web-voyager-root .view .chart {
-    flex: 1;
-    width: 100%;
-    background-color: white;
-    overflow: scroll;
-}
-
 #web-voyager-root .view .title {
     display: flex;
     width: 100%;
@@ -57,8 +41,8 @@
 
 #web-voyager-root .view .title span {
     flex: 1;
+    font-weight: bold;
 }
-
 
 .web-voyager-row-highlight {
     border: 1px solid var(--web-voyager-theme-color);
@@ -66,4 +50,51 @@
 
 .web-voyager-column-highlight {
     background-color: var(--web-voyager-theme-color-light);
+}
+
+#web-voyager-root .chart-data  {
+    display: flex;
+    width: 180px;
+}
+
+#web-voyager-root .chart-data .data-fields {
+    flex: 1;
+    width: 100%;
+    color: black;
+}
+
+#web-voyager-root .chart-data .data-field {
+    display: flex;
+    width: 160px;
+    justify-content: flex-start;
+    align-items: center;
+    margin: var(--web-voyager-margin);
+    padding: var( --web-voyager-padding);
+}
+
+#web-voyager-root .chart-data .data-field .data-field-name input {
+    font-size: 0.9em !important;
+}
+
+#web-voyager-root .chart-view {
+    flex: 1;
+    display: flex;
+}
+
+#web-voyager-root .chart-view .charts {
+    flex: 1;
+    overflow-x: scroll;
+    overflow-y: hidden;
+    width: 100%;
+    display: flex;
+    border-radius: 5px;
+}
+
+#web-voyager-root .chart-view .chart {
+    min-width: 50%;
+    margin: var(--web-voyager-margin);
+    padding: var( --web-voyager-padding);
+    overflow-y: scroll;
+    background-color: white;
+    border-radius: 5px;
 }
