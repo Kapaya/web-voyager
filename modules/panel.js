@@ -3,24 +3,153 @@ const Panel = (function(){
     let _chartViewElement;
     let _dataFieldsElement;
     let _data;
+    let _dataFieldToAlias = {};
+    let _dataFieldToColumnSelector;
+    const _panelElementCSS = `
+        <style> 
+            :host {
+                display: flex;
+                position: fixed;
+                padding: 2.5px;
+                bottom: 0;
+                left: 0;
+                height: 300px;
+                width: 100vw;
+                z-index: 10000000;
+                overflow: hidden;
+                background-color: #38425d;
+                color: white;
+                box-shadow: 0px 0px 10px -1px #d5d5d5;
+            }
+            
+            .view {
+                margin: 2.5px;
+                padding: 2.5px; 
+                display: flex;
+                flex-direction: column;
+                justify-content: center;
+                align-items: center;
+            }
+            
+            .view > * {
+                margin: 2.5px;
+                padding: 2.5px; 
+            }
+            
+            .view .title {
+                display: flex;
+                width: 100%;
+            }
+            
+            .view .title span {
+                flex: 1;
+                font-weight: bold;
+            }
+            
+            .chart-data  {
+                display: flex;
+                width: 180px;
+            }
+            
+            .chart-data .data-fields {
+                flex: 1;
+                width: 100%;
+                color: black;
+            }
+            
+            .chart-data .data-field {
+                display: flex;
+                width: 160px;
+                justify-content: flex-start;
+                align-items: center;
+                margin: 2.5px;
+                padding: 2.5px;
+            }
+
+            .chart-data .data-field > * {
+                margin: 1.5;
+                padding: 1.5px;
+            }
+            
+            .chart-data .data-field .data-field-name input {
+                font-size: 0.9em !important;
+            }
+            
+            .chart-view {
+                flex: 1;
+                display: flex;
+                background-color: #e2e9f3;
+                color: black;
+                border-radius: 5px;
+            }
+            
+            .chart-view .charts {
+                flex: 1;
+                overflow-x: scroll;
+                overflow-y: hidden;
+                width: 100%;
+                display: flex;
+                border-radius: 5px;
+            }
+            
+            .chart-view .chart {
+                min-width: 50%;
+                margin: 2.5px;
+                padding: 2.5px;
+                overflow-y: scroll;
+                background-color: white;
+            }
+        </style>
+    `;
+
+    const _panelElementString = `
+        ${_panelElementCSS}
+        <div class='view chart-data'>
+            <div class='title'>
+                <span> Data Fields </span>
+            </div>
+            <div class='data-fields'>
+            </div>
+        </div>
+        <div class='view chart-view'>
+            <div class='title'>
+                <span> Visualizations Of Selected Data Fields </span>
+            </div>
+            <div class='charts'>
+            </div>
+        </div>
+    `;
 
     function render() {
-        const body = document.querySelector('body');
         _panelElement = _createPanelElement();
-        _chartViewElement = _panelElement.querySelector('.chart-view');
-        _dataFieldsElement = _panelElement.querySelector('.chart-data .data-fields');
+        _chartViewElement = _panelElement.shadowRoot.querySelector('.chart-view');
+        _dataFieldsElement = _panelElement.shadowRoot.querySelector('.chart-data .data-fields');
         Utils.eventListener({
            element: _dataFieldsElement,
            type: 'add',
            event: 'change',
            listener: _dataFieldsCheckboxEventListener 
-        })
-        body.append(_panelElement);
+        });
+        Utils.eventListener({
+            element: _dataFieldsElement,
+            type: 'add',
+            event: 'blur',
+            listener: _dataFieldsBlurChangeListener
+         });
+        Utils.eventListener({
+            element: _dataFieldsElement,
+            type: 'add',
+            event: 'click',
+            listener: _dataFieldsInputsClickListener
+         });
+        document.body.append(_panelElement);
     }
 
-    function setChartData({ data }) {
+    function setChartData({ data, fieldToColumnSelector }) {
+        _dataFieldToColumnSelector = fieldToColumnSelector;
         _data = data;
         const sample = data[0];
+        _updateDataFieldNames();
         Object
             .keys(sample)
             .forEach((field) => {
@@ -30,31 +159,20 @@ const Panel = (function(){
                 }
             });
         if (_dataFieldsElement.querySelectorAll('.data-field').length > 0) {
-            _rendersCharts();
+           _renderCharts();
         }
     }
 
     function _createPanelElement() {
-        const panelElementString = `
-            <div class='view chart-data'>
-                <div class='title'>
-                    <span> Data </span>
-                </div>
-                <div class='data-fields'>
-                </div>
-            </div>
-            <div class='view chart-view'>
-                <div class='title'>
-                    <span> Charts </span>
-                </div>
-                <div class='charts'>
-                </div>
-            </div>
-        `;
-        const panelElement = document.createElement('div');
-        panelElement.id = Constants.PANEL_ID;
-        panelElement.innerHTML = panelElementString;
-        return panelElement;
+        class WebVoyegar extends HTMLElement {
+            constructor() {
+                super();
+                this.attachShadow({mode: 'open'});
+                this.shadowRoot.innerHTML = _panelElementString;
+            }
+        }
+        window.customElements.define('web-voyager', WebVoyegar);
+        return document.createElement('web-voyager');
     }
 
     function _createDataFieldElement({ field, sample }) {
@@ -69,33 +187,93 @@ const Panel = (function(){
         `;
         const fieldElement = document.createElement('div');
         fieldElement.classList.add('data-field');
-        fieldElement.dataset.field = field;
+        fieldElement.dataset.originalFieldName = field;
+        fieldElement.dataset.currentFieldName = field;
         fieldElement.innerHTML = fieldElementString;
         return fieldElement;
     }
 
     function _dataFieldsElementHasField({ field }) {
-        return !!_dataFieldsElement.querySelector(`[data-field="${field}"]`);
+        return !!_dataFieldsElement.querySelector(`[data-current-field-name="${field}"]`);
     }
 
     function _dataFieldsCheckboxEventListener(event) {
         const { target } = event;
         if (target.type === "checkbox") {
-            _rendersCharts();
+            _renderCharts();
         }
     }
 
+    function _dataFieldsBlurChangeListener(event) {
+        const { target } = event;
+        if (target.nodeName === "INPUT" && target.type !== "checkbox") {
+            const { originalFieldName, currentFieldName } = _getFieldName({ element: target })
+            const updatedFieldName = target.value;
+            const columnSelector = _dataFieldToColumnSelector[originalFieldName];
+            VisualFeedback.unhighlightColumnElements({ columnSelector });
+            if (updatedFieldName && updatedFieldName !== currentFieldName) {
+                _updateDataFieldNames({ 
+                    originalFieldName,
+                    updatedFieldName 
+                });
+                _updateDataFieldElement({ originalFieldName , updatedFieldName });
+                _renderCharts();
+            }
+        }
+    }
 
-    function _rendersCharts() {
+    function _dataFieldsInputsClickListener(event) {
+        const { target } = event;
+        if (target.nodeName === "INPUT" && target.type !== "checkbox") {
+            const { originalFieldName } = _getFieldName({ element: target })
+            const columnSelector = _dataFieldToColumnSelector[originalFieldName];
+            VisualFeedback.unhighlightColumnElements({
+                columnSelector: WrapperInduction.currentColumnSelector()
+            });
+            WrapperInduction.currentColumnSelector(columnSelector);
+            VisualFeedback.highlightColumnElements({ columnSelector });
+        } 
+    }
+
+    function _updateDataFieldNames(options) {
+        if (options) {
+            const { originalFieldName, updatedFieldName } = options;
+            _data.forEach(entry => {
+                const fieldKey = _dataFieldToAlias[originalFieldName] || originalFieldName;
+                const fieldValue = entry[fieldKey];
+                if (fieldValue) {
+                    entry[updatedFieldName] = fieldValue;
+                    delete entry[fieldKey];
+                }                    
+            });
+            _dataFieldToAlias[originalFieldName] = updatedFieldName;
+        } else {
+            Object
+                .keys(_dataFieldToAlias)
+                .forEach(fieldName => {
+                    _data.forEach(entry => {
+                        entry[_dataFieldToAlias[fieldName]] = entry[fieldName];
+                        delete entry[fieldName]
+                    })
+                })
+        }
+            
+    }
+
+    function _updateDataFieldElement({ originalFieldName, updatedFieldName }) {
+        const fieldElement = _dataFieldsElement.querySelector(`[data-original-field-name="${originalFieldName}"]`);
+        if (fieldElement) {
+            fieldElement.dataset.currentFieldName = updatedFieldName;
+        }
+    }
+
+    function _renderCharts() {
         const checkBoxes = _dataFieldsElement.querySelectorAll('.checkbox input') || [];
         const fields = Array.from(checkBoxes)
             .filter(element => element.checked)
             .map(element => {
-                let parent = element.parentElement;
-                while (parent && !parent.dataset.field) {
-                    parent = parent.parentElement;
-                }
-                return parent.dataset.field;
+                const { currentFieldName } = _getFieldName({ element })
+                return currentFieldName;
             });
         const chartsElement = _chartViewElement.querySelector('.charts');
         chartsElement.innerHTML = "";
@@ -107,12 +285,22 @@ const Panel = (function(){
                 chartsElement.append(chartElement);
                 await _renderChart({ element: chartElement, config, data: _data });
             });
-        }  
+        } 
+    }
+
+    function _getFieldName({ element }) {
+        let parent = element.parentElement;
+        while (parent && !parent.dataset.originalFieldName) {
+            parent = parent.parentElement;
+        }
+        const { originalFieldName, currentFieldName } = parent.dataset;
+        return {
+            originalFieldName,
+            currentFieldName
+        } 
     }
 
     async function _renderChart({ element, config, data  }) {
-        // config.height = element.clientHeight;
-        // config.width = element.clientWidth;
         await vegaEmbed(element, config);
     }
 

@@ -1,19 +1,29 @@
 const WrapperInduction = (() => {
     let _rowElement;
+    let _tempRowElement;
     let _rowSelector;
+    let _tempRowSelector;
+    let _currentColumnSelector;
     let _columnSelectors = new Set([]);
    
-    function getWrapperData(node) {
+    function getWrapperData(node, exploring) {
         if (node) {
             if (!_rowElement && !_rowSelector && _columnSelectors.size === 0) {
                 const wrapperData = _createWrapperData(node);
                 if (wrapperData) {
-                    _rowElement = wrapperData.rowElement;
-                    _rowSelector = wrapperData.rowSelector;
-                    const classSelector = DOMHelpers.generateClassSelectorFrom(node, _rowElement, false);
-                    const indexSelector = DOMHelpers.generateIndexSelectorFrom(node, _rowElement);
+                    const { rowElement, rowSelector } = wrapperData;
+                    const classSelector = DOMHelpers.generateClassSelectorFrom(node, rowElement, false);
+                    const indexSelector = DOMHelpers.generateIndexSelectorFrom(node, rowElement);
                     const selector = classSelector || indexSelector;
-                    _columnSelectors.add(selector);
+                    _currentColumnSelector = selector;
+                    if (!exploring) {
+                        _rowElement = rowElement;
+                        _rowSelector = rowSelector;
+                        _columnSelectors.add(selector);
+                    } else {
+                        _tempRowElement = rowElement;
+                        _tempRowSelector = rowSelector;
+                    }
                 }
             } else if (_rowSelector) {
                 const rowElement = DOMHelpers.getParentRowElement({ rowSelector: _rowSelector, node });
@@ -21,14 +31,34 @@ const WrapperInduction = (() => {
                     const classSelector = DOMHelpers.generateClassSelectorFrom(node, rowElement, false);
                     const indexSelector = DOMHelpers.generateIndexSelectorFrom(node, rowElement);
                     const selector = classSelector || indexSelector;
-                    _columnSelectors.add(selector);
+                    _currentColumnSelector = selector;
+                    if (!exploring) {
+                        _columnSelectors.add(selector);
+                    }
+                } else {
+                    _currentColumnSelector = null;
                 }
             }
         } 
         return {
-            rowElement: _rowElement,
-            rowSelector: _rowSelector,
-            columnSelectors: Array.from(_columnSelectors)
+            rowElement: _rowElement || _tempRowElement,
+            rowSelector: _rowSelector || _tempRowSelector,
+            columnSelectors: Array.from(_columnSelectors),
+            currentColumnSelector: _currentColumnSelector
+        }
+    }
+
+    function currentColumnSelector(value) {
+        if (value) {
+            _currentColumnSelector = value;
+        }
+        return _currentColumnSelector;
+    }
+
+    function getTempRowData() {
+        return {
+            tempRowElement: _tempRowElement,
+            tempRowSelector: _tempRowSelector
         }
     }
 
@@ -73,6 +103,8 @@ const WrapperInduction = (() => {
     }
 
     return {
-        getWrapperData
+        getWrapperData,
+        getTempRowData,
+        currentColumnSelector
     }
 })();

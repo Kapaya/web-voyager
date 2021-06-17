@@ -69,7 +69,12 @@ const DOMHelpers = (() => {
         if (node.classList && node.classList.length) {
             let selectors = [];
             const nodeTagName = node.tagName.toLowerCase();
-            const allClassCombinations = getAllClassCombinations(Array.from(node.classList));
+            const classes = Array
+                .from(node.classList)
+                .filter(className => {
+                    return [Constants.COLUMN_ACTIVE_CLASS, Constants.COLUMN_HIGHLIGHT_CLASS].indexOf(className) === -1;
+                });
+            const allClassCombinations = getAllClassCombinations(classes);
             if (isRow) {
                 const siblings = Array
                     .from(node.parentNode.children)

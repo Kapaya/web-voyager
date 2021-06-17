@@ -9,7 +9,6 @@ const ChartRecommender = (function(){
               "encodings": fields.map(field => { 
                 const sampleValue = data[0][field];
                 const type = Number.isNaN(parseInt(sampleValue)) ? "nominal" : "quantitative";
-                console.log(sampleValue, type)
                 return {
                     "channel": "?",
                     "field": field,
@@ -45,7 +44,6 @@ const ChartRecommender = (function(){
         const output = cql.recommend(query, schema);
         const { result } = output;
         const vlTree = cql.result.mapLeaves(result, item => item.toSpec());
-        console.log(vlTree);
         const specs = []
         populateSpecs({ items: vlTree.items, specs });
         specs.forEach(spec => {

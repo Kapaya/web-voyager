@@ -6,6 +6,7 @@
     "content_scripts": [
       {
         "js": [
+          "./modules/libs/webcomponents.js",
           "./modules/libs/vega.js",
           "./modules/libs/vega-lite.js",
           "./modules/libs/vega-embed.js",
