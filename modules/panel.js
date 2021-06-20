@@ -4,6 +4,7 @@ const Panel = (function(){
     let _dataFieldsElement;
     let _data;
     let _dataFieldToAlias = {};
+    let _dataFieldToType = {};
     let _dataFieldToColumnSelector;
     const _panelElementCSS = `
         <style> 
@@ -48,7 +49,7 @@ const Panel = (function(){
             
             .chart-data  {
                 display: flex;
-                width: 180px;
+                width: 230px;
             }
             
             .chart-data .data-fields {
@@ -59,7 +60,7 @@ const Panel = (function(){
             
             .chart-data .data-field {
                 display: flex;
-                width: 160px;
+                width: 200px;
                 justify-content: flex-start;
                 align-items: center;
                 margin: 2.5px;
@@ -134,13 +135,19 @@ const Panel = (function(){
             element: _dataFieldsElement,
             type: 'add',
             event: 'blur',
-            listener: _dataFieldsBlurChangeListener
+            listener: _dataFieldNameListener
          });
         Utils.eventListener({
             element: _dataFieldsElement,
             type: 'add',
             event: 'click',
-            listener: _dataFieldsInputsClickListener
+            listener: _dataFieldToggleListener
+         });
+         Utils.eventListener({
+            element: _dataFieldsElement,
+            type: 'add',
+            event: 'change',
+            listener: _dataFieldTypeListener
          });
         document.body.append(_panelElement);
     }
@@ -150,6 +157,7 @@ const Panel = (function(){
         _data = data;
         const sample = data[0];
         _updateDataFieldNames();
+        _setDataFieldTypes({ sample });
         Object
             .keys(sample)
             .forEach((field) => {
@@ -177,13 +185,21 @@ const Panel = (function(){
 
     function _createDataFieldElement({ field, sample }) {
         const checkboxIsChecked = Object.keys(sample).length === 1;
+        const fieldTypeKey = _getDataFieldTypeKey({ field });
+        const dataFieldType = _dataFieldToType[fieldTypeKey];
         const fieldElementString = `
-            <div class="checkbox">
+            <div class="data-field-toggle">
                 <input type="checkbox" aria-label="Checkbox for data field" ${checkboxIsChecked ? 'checked' : ''}>
             </div>
             <div class="data-field-name">
                 <input type="text" aria-label="Data field" value="${field}">
             </div>
+            <select class="data-field-type">
+                <option value="nominal" ${dataFieldType === "nominal" ? "selected" : ""}>N</option>
+                <option value="quantitative" ${dataFieldType === "quantitative" ? "selected" : ""}>Q</option>
+                <option value="ordinal" ${dataFieldType === "ordinal" ? "selected" : ""}>O</option>
+                <option value="temporal" ${dataFieldType === "temporal" ? "selected" : ""}>T</option>
+            </select>
         `;
         const fieldElement = document.createElement('div');
         fieldElement.classList.add('data-field');
@@ -204,7 +220,7 @@ const Panel = (function(){
         }
     }
 
-    function _dataFieldsBlurChangeListener(event) {
+    function _dataFieldNameListener(event) {
         const { target } = event;
         if (target.nodeName === "INPUT" && target.type !== "checkbox") {
             const { originalFieldName, currentFieldName } = _getFieldName({ element: target })
@@ -222,7 +238,7 @@ const Panel = (function(){
         }
     }
 
-    function _dataFieldsInputsClickListener(event) {
+    function _dataFieldToggleListener(event) {
         const { target } = event;
         if (target.nodeName === "INPUT" && target.type !== "checkbox") {
             const { originalFieldName } = _getFieldName({ element: target })
@@ -233,6 +249,16 @@ const Panel = (function(){
             WrapperInduction.currentColumnSelector(columnSelector);
             VisualFeedback.highlightColumnElements({ columnSelector });
         } 
+    }
+
+    function _dataFieldTypeListener(event) {
+        const { target } = event;
+        if (target.nodeName === "SELECT") {
+            const dataFieldType = target.value;
+            const { originalFieldName } = _getFieldName({ element: target })
+            _dataFieldToType[originalFieldName] = dataFieldType;
+            _renderCharts();
+        }
     }
 
     function _updateDataFieldNames(options) {
@@ -256,8 +282,16 @@ const Panel = (function(){
                         delete entry[fieldName]
                     })
                 })
-        }
-            
+        }     
+    }
+
+    function _setDataFieldTypes({ sample }) {
+        Object.keys(sample)
+            .forEach(field => {
+                if (!_dataFieldToType[field]) {
+                    _dataFieldToType[field] = Number.isNaN(parseInt(sample[field])) ? "nominal" : "quantitative";
+                }
+            });
     }
 
     function _updateDataFieldElement({ originalFieldName, updatedFieldName }) {
@@ -268,7 +302,7 @@ const Panel = (function(){
     }
 
     function _renderCharts() {
-        const checkBoxes = _dataFieldsElement.querySelectorAll('.checkbox input') || [];
+        const checkBoxes = _dataFieldsElement.querySelectorAll('.data-field-toggle input') || [];
         const fields = Array.from(checkBoxes)
             .filter(element => element.checked)
             .map(element => {
@@ -278,7 +312,8 @@ const Panel = (function(){
         const chartsElement = _chartViewElement.querySelector('.charts');
         chartsElement.innerHTML = "";
         if (fields.length) {
-            const configs = ChartRecommender.recommend({ fields, data: _data });
+            const fieldData = _getDataFieldsAndTypes({ fields });
+            const configs = ChartRecommender.recommend({ fieldData, data: _data });
             configs.forEach(async (config) => {
                 const chartElement = document.createElement('div');
                 chartElement.classList.add('chart');
@@ -286,6 +321,23 @@ const Panel = (function(){
                 await _renderChart({ element: chartElement, config, data: _data });
             });
         } 
+    }
+
+    function _getDataFieldsAndTypes({ fields }) {
+        const dataFieldAndTypes = [];
+        fields.forEach(field => {
+            const fieldTypeKey = _getDataFieldTypeKey({ field });
+            dataFieldAndTypes.push({
+                field,
+                type: _dataFieldToType[fieldTypeKey]
+            });
+        });
+       return dataFieldAndTypes;
+    }
+
+    function _getDataFieldTypeKey({ field }) {
+        const originalField = Object.keys(_dataFieldToAlias).find(originalField => _dataFieldToAlias[originalField] === field);
+        return originalField || field;
     }
 
     function _getFieldName({ element }) {

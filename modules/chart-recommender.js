@@ -1,14 +1,12 @@
 const ChartRecommender = (function(){ 
-    function recommend({ fields, data }) {
+    function recommend({ fieldData, data }) {
         const opts = {};
         const schema = cql.schema.build(data, opts);
         const query = {
             "spec": {
               "data": data,
               "mark": "?",
-              "encodings": fields.map(field => { 
-                const sampleValue = data[0][field];
-                const type = Number.isNaN(parseInt(sampleValue)) ? "nominal" : "quantitative";
+              "encodings": fieldData.map(({ field, type }) => { 
                 return {
                     "channel": "?",
                     "field": field,
