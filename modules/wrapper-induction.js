@@ -93,7 +93,6 @@ const WrapperInduction = (() => {
             candidates.sort((a, b) => b.score - a.score);
             const rowElement = candidates[0].candidate;
             const rowSelector = DOMHelpers.generateClassSelectorFrom(rowElement, document.querySelector('body'), true);
-           
             return {
                 rowElement,
                 rowSelector

@@ -72,7 +72,11 @@ const DOMHelpers = (() => {
             const classes = Array
                 .from(node.classList)
                 .filter(className => {
-                    return [Constants.COLUMN_ACTIVE_CLASS, Constants.COLUMN_HIGHLIGHT_CLASS].indexOf(className) === -1;
+                    return [
+                        Constants.COLUMN_ACTIVE_CLASS,
+                        Constants.COLUMN_HIGHLIGHT_CLASS,
+                        Constants.ROW_HIGHLIGHT_CLASS
+                    ].indexOf(className) === -1;
                 });
             const allClassCombinations = getAllClassCombinations(classes);
             if (isRow) {

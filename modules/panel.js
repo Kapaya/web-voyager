@@ -313,7 +313,16 @@ const Panel = (function(){
         chartsElement.innerHTML = "";
         if (fields.length) {
             const fieldData = _getDataFieldsAndTypes({ fields });
-            const configs = ChartRecommender.recommend({ fieldData, data: _data });
+            const data = _data.filter(entry => {
+                let hasValueForAllFields = true;
+                fieldData.forEach(({ field }) => {
+                    if (!entry[field]) {
+                        hasValueForAllFields = false;
+                    }
+                });
+                return hasValueForAllFields
+            })
+            const configs = ChartRecommender.recommend({ fieldData, data });
             configs.forEach(async (config) => {
                 const chartElement = document.createElement('div');
                 chartElement.classList.add('chart');
